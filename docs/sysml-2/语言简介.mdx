@@ -1,5 +1,6 @@
 ---
 slug: language-tour
+keywords: ['SysML', 'SysML 2']
 ---
 
 import Colored from '../../src/common/Colored/Colored'
@@ -544,7 +545,379 @@ part vehicle : Vehicle {
 连接用来将部件连起来，而接口用来将端口连起来。
 正如端口是部件的一个特化，接口也是连接的一个特化。
 
-<!--
-#### 接口分解 Interface Decomposition
+<!-- #### 接口分解 Interface Decomposition -->
 
-### 绑定连接 Binding Connection -->
+### 绑定连接 Binding Connection
+
+*绑定连接*是连接的一种，表示连接的特征具有相等性，
+即在相同的上下文里，它们的值是相等的，一般表示这两者指向同一个对象。
+
+```sysml
+part tank : FuelTankAssembly {
+    port redefines fuelTankPort {
+        out item redefines fuelSupply;
+        in item redefines fuelReturn;
+    }
+
+    bind fuelTankPort.fuelSupply = pump.pumpOut;
+    bind fuelTankPort.fuelReturn = tank.fuelIn;
+
+    part pump : FuelPump {
+        out item pumpOut : Fuel;
+        in item pumpIn : Fuel;
+    }
+
+    part tank : FuelTank {
+        out item fuelOut : Fuel;
+        in item fuelIn : Fuel;
+    }
+}
+```
+
+上面示例中，将端口`fuelTankPort`的流出的对象`fuelSupply`和部件`pump`的流出对象`pumpOut`连接起来，
+表示由部件 pump 流出的 fuel，经端口 fuelTankPort 代理后，再向外部流出。
+
+:::note
+绑定连接的语法为 `bind oneFeature = anotherFeature`，前面的`bind`关键字可以省略。
+注意这和赋值语句的含义是不同的。
+:::
+
+### 流连接 Flow Connection
+
+*流连接*既表示源端口和目标端口之间的一个连接，也表示从源的输出到目标的输入之间存在项目的传输。
+
+```sysml
+part vehicle : Vehicle {
+    part tankAssy : FuelTankAssembly;
+    part eng : Engine;
+
+    flow of Fuel
+        from tankAssy.fuelTankPort.fuelSupply
+        to eng.engineFuelPort.fuelSupply;
+
+    flow of Fuel
+        from eng.engineFuelPort.fuelReturn
+        to tankAssy.fuelTankPort.fuelReturn;
+}
+```
+
+在第一条流连接中，连接的是`fuelTankPort`和`engineFuelPort`这两个端口，
+以及将流动的内容指定为各自的 fuelSupply 项目。而其中具体流动的项目，通过`of`来指定。
+指定的项目的类型，必须和流连接所连接的两端类型相兼容（和两端类型相同或者是其特化类型）。
+
+#### Streaming Flow Connection
+
+TODO:
+
+#### 连续接口 Streaming Interface
+
+TODO:
+
+### 动作 Action
+
+*动作定义*是对可以执行的某些动作的定义。
+动作定义可以拥有参数，参数的方向可以是`in`、`out`或者`inout`。
+如果未指定方向，则默认为`in`。
+
+动作的参数定义在动作名称之后的小括号中；也可以直接定义在动作体中，类似于有向特征的定义。
+
+```sysml
+action def  Focus(in scene: Scene, out image : Image);
+action def  Shoot(in image: Image, out picture : Picture);
+
+action def TakePicture
+    (in scene : Scene,
+    out picture : Picture) {
+    bind focus.scene = scene;
+
+    action focus : Focus (in scene, out image);
+
+    flow focus.image to shoot.image;
+
+    action shoot : Shoot (in image ,out picture);
+
+    bind shoot.picture = picture;
+}
+```
+
+动作在使用时，其具有和定义时相同类型和方向的参数，但是名字可以不一样。
+动作的参数和动作定义的参数，可以使用绑定连接；
+绑定连接的形式除了使用`bind`之外，还可以直接在动作体内部进行绑定：
+
+```
+action focus : Focus {
+    in item scene = TakePicture::scene;
+    out item image;
+}
+```
+
+动作之间，可以使用流连接来关联参数，表示动作之间存在项目的传递。
+流连接除了使用`flow to`之外，还可以直接在动作体内进行关联：
+
+```sysml
+action shoot : Shoot {
+    in item image flow from focus.image;
+    out item picture = TakePicture::picture;
+}
+```
+
+#### 动作顺序 Action Succession
+
+动作顺序指定在第二个动作开始之前，第一个动作必须完成。
+
+```sysml
+action def TakePicture {
+    in item scene : Scene;
+    out item picture : Picture;
+
+    bind focus.scene = scene;
+
+    action focus : Focus (in scene, out image);
+
+    flow focus.image to shoot.iamge;
+
+    first focus then shoot; // 指定执行顺序
+
+    action shoot : Shoot(in image, out picture);
+
+    bind shoot.picture = picture;
+}
+```
+
+除了使用`first ... then ...`的形式之外，还可以直接在动作前面使用关键字`then`来表示当前动作和其之前紧邻的上一个动作之间存在先后顺序。
+
+```sysml
+action focus : Focus (in scene, out image);
+then action shoot : Shoot(in image, out picture);
+```
+
+:::note
+不同于 SysMLv1 中使用栓（Pin）来对动作的输入和输出进行封装，这里直接使用输入和输出参数进行连接。
+:::
+
+可以使用简写形式`succession flow`表示
+
+#### 动作分解 Action Decomposition
+
+TODO:
+
+#### 条件顺序 Condional Succession
+
+动作顺序可以添加守卫条件，当前一个动作完成，并且满足守卫条件时，才可以执行下一个动作。
+
+```sysml
+action takePicture : TakePicture {
+    in item scene;
+    out item picture;
+
+    action focus : Focus {
+        in item scene = takePicture;
+        out item image;
+    }
+
+    // 当图像聚焦时，才进行拍摄动作
+    first focus
+        if focus.image.isFocused then shoot;
+
+    action shoot : Shoot {
+        in item image flow from focus.image;
+        out item picture = takePicture::picture;
+    }
+}
+```
+
+同样，守卫条件也可以使用简写形式，将`first ...`省略，此种情况表示在词法上相邻的两个动作之间的条件顺序。
+
+#### 合并节点 Merge Node
+
+合并节点可以连接多条输入顺序，当且仅当其中的一个发生的时候，才执行之后的动作。
+
+```sysml
+action takePicture : TakePicture {
+    first start;
+    then merge continue;
+    then action trigger {out item scene;}
+    then action focus : Focus {
+        in item scene flow from trigger.scene;
+        out item image;
+    }
+
+    then action shoot : Shoot {
+        in image flow from focus.image;
+        out picture;
+    }
+
+    then action display {
+        in picture flow from shoot.picture;
+    }
+    then continue;
+}
+```
+
+![merge mode](../_assets/takePicture_merge_node.jpg)
+
+#### 判断节点 Decision Node
+
+判断节点选择其之后的一个动作进行执行。
+
+```sysml
+
+action def ChargeBattery {
+    first start;
+    then merge continueCharging;
+    then action monitor : MonitorBattery {
+        out batteryCharge : Real;
+    }
+
+    then decide; // 使用decide关键字定义判断节点
+        if monitor.batteryCharge <= 100 then addCharge;
+        if monitor.batteryCharge >= 100 then endCharging;
+
+    action addCharge : AddCharge {
+        in charge = monitor.batteryCharge;
+    }
+    then continueCharging;
+
+    action endCharging : EndCharging;
+
+    then done;
+}
+```
+
+![action decision node](../_assets/action_decision_node.png)
+
+在最后一个判断条件中，可以使用`else`来对其余情况进行处理。
+
+#### 控制结构 Control Structure
+
+控制结构用来对动作的条件执行和循环，提供了一种结构化的实现方式。
+
+```sysml
+action def ChargeBattery {
+    loop action charging {
+        action monitor : MonitorBattery {
+            out charge;
+        }
+
+        then if monitor.charge < 100 {
+            action addCharge : AddCharge {
+                in charge = monitor.Charge
+            }
+        }
+    } until charging.monitor.charge >= 100;
+}
+```
+
+控制结构的表达式也可以使用`while`来实现。
+
+```
+while charging.monitor.charge >=100 {
+    action charging {}
+}
+```
+
+:::note
+控制结构实现的功能，可以通过 merge，decision 来实现，不过控制结构的方式更为简洁。
+:::
+
+#### 分支/集合 Fork/Join
+
+分支节点将其之后的所有紧邻后续动作一起执行。
+
+```sysml
+action def Brake {
+    action TurnOn;
+    then fork;
+        then monitorBrakePedal; // 此三个动作的源动作都是分支节点
+        then monitorTraction;
+        then braking;
+
+    action monitorBrakePedal : MonitorBrakePedal {
+        out brakePressure;
+    }   then joinNode;
+
+    action monitorTraction : MonitorTraction {
+        out modulationFrequency;
+    }   then joinNode;
+
+    action braking : Braking {
+        in brakePressure flow from
+            monitorBrakePedal.brakePressure;
+        in modulationFrequency flow from
+            monitorTraction.modulationFrequency;
+    }   then joinNode;
+
+    join joinNode;
+    then done;
+}
+```
+
+![action fork join](../_assets/action_fork_join.png)
+
+#### 履行动作 Performed Action
+
+使用关键字`perform`可以指定动作的执行者。
+
+```sysml
+part camera : Camera {
+    perform action takePhoto [*] ordered
+        :> takePicture;  // 对takePicture动作进行继承
+
+    part f : AutoFocus {
+        perform takePhoto.focus;
+    }
+
+    part i : Imager {
+        perform takePhoto.shoot;
+    }
+}
+```
+
+![perform action](../_assets/perform_action.svg)
+
+:::note
+类似于 SysML1 中的动作结构分配。
+:::
+
+#### 赋值动作 Assignment Action
+
+通过赋值动作，可以将一个表达式的值赋给某个特征。
+
+```sysml
+action def ComputeMotion {
+    in attribute powerProfiles :>  ISQ::power[*];
+    in attribute vehicleMass :> ISQ::mass;
+    in attribute initialPosition :> ISQ::length;
+    in attribute initialSpeed :> ISQ::speed;
+    in attribute deltaT :> ISQ::time;
+    out attribute positions :> IsQ::length[*] := ();
+
+    private attribute position := initialPosition;
+    private attribute speed := initialSpeed;
+
+    for i in 1..powerProfiles->size()-1 {
+        perform action dynamics : StraightLightDynamics {
+            in power = powerProfiles[i];
+            in mass = vehicleMass;
+            in delta_t = deltaT;
+            in x_in = position; in v_in = speed;
+            out x_out; out v_out;
+        }
+        then assign position := dynamics.x_out;
+        then assign speed := dynamics.v_out;
+        then assign positions := positions->including(position);
+    }
+}
+```
+
+使用`:=`操作符，可以进行初始值的赋值操作。注意和绑定操作符`=`的区别。
+
+使用`assign`关键字，可以创建一个赋值动作。
+![assignment action](../_assets/assignment_action.svg)
+
+:::note
+其中用到的`size()` 和`including()`函数来自于`SequenceFunctions`基础库，
+可以通过`import SequenceFunctions::*`来使用它们。
+:::
+
+### 状态机 StateMachine

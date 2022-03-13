@@ -63,6 +63,9 @@ const config = {
           // },
         ],
       },
+      tableOfContents: {
+        maxHeadingLevel: 4,
+      },
       footer: {
         style: 'dark',
         links: [
@@ -104,6 +107,7 @@ const config = {
         ],
         copyright: `Copyright © ${new Date().getFullYear()} MBSE works, Inc. Built with Docusaurus.`,
       },
+      metadata: [{ name: 'keywords', contents: 'MBSE, SysML, 系统工程' }],
       prism: {
         theme: lightCodeTheme,
         darkTheme: darkCodeTheme,
