@@ -113,6 +113,12 @@ const config = {
         darkTheme: darkCodeTheme,
       },
     }),
+  plugins: [
+    [
+      'docusaurus-plugin-baidu-analytics',
+      { analyticsId: '9a94f478ef002ccb2a35f556aba3f9f4' },
+    ],
+  ],
 }
 
 module.exports = config
