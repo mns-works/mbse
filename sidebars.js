@@ -22,6 +22,15 @@ const sidebars = {
       label: 'sysml-2',
       items: ['sysml-2/语言简介', 'sysml-2/工具'],
     },
+    {
+      type: 'category',
+      label: '规范',
+      'items': [{
+        type: 'category',
+        label: 'SysML 2',
+        items: ['spec/sysml2/6 介绍']
+      }]
+    }
   ],
 
   // But you can create a sidebar manually
