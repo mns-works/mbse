@@ -28,7 +28,7 @@ const sidebars = {
       'items': [{
         type: 'category',
         label: 'SysML 2',
-        items: ['spec/sysml2/6 介绍']
+        items: ['spec/sysml2/6 介绍', 'spec/sysml2/7 语言说明']
       }]
     }
   ],
