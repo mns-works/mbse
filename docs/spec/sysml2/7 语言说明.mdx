@@ -101,3 +101,59 @@ namespace P {
 
 #### 7.2.2.3 关系
 
+关系的相关元素被分为*源（source）*和*目标（target）*两种。
+关系从源元素*指向（directed）*目标元素。
+关系可以只具有源或者目标。
+但是，根据约定，*无向（undirected）*关系通常用只具有目标元素的关系来表示。
+
+关系必须至少包括两个相关元素。
+具有两个相关元素的关系称为*二元（binary）关系*。
+*有向二元关系（directed binary relationship)*是指具有一个源和一个目标的二元关系。
+KerML中的大多数关系种类都是有向二元关系（主要的例外包括依赖、关联，以及连接器）。
+
+不同种类的关系通过不同的记号来展示它们的相关元素。
+关系也可以具有内容体，用来表示该关系所拥有的相关元素。
+如果一个注解元素（注释、文本表示或者元数据特性）被包含在关系的内容体中，
+那么该注解元素不是直接作为关系的拥有元素，而是作为该关系所拥有的一个注解关系下的被拥有的元素而存在。
+
+### 7.2.3 依赖
+
+*依赖（dependency）*是在任意数量的客户端（源）和服务端（目标）元素之间一种关系。
+它表示服务端的变化，可能导致客户端元素的变化。
+依赖可以以一种抽象的方式来表示元素之间的关系。
+例如，依赖可以用来表示架构中的顶层可能依赖于底层。
+
+#### 7.2.3.2 依赖声明
+
+依赖通过关键字`dependency`来声明，后面可以添加简称和名称。
+依赖的客户端元素在关键字`from`后面，使用逗号分隔的全称列表来表示。
+再后面是关键字`to`后面服务端元素的列表。
+如果依赖没有指定简称或名称，那么关键字`from`可以省略。
+
+```sysml
+    dedependency Use
+        from 'Application Layer' to 'Service Layer';
+    // 'Service Layer' 是依赖的客户端元素，不是依赖的名称
+    dependency 'Service Layer'
+        to 'Data Layer', 'External Interface Layer'
+```
+
+依赖的声明亦可以具有内容体，包括额外的拥有元素（作为服务端元素），以及通过注解关系被此依赖所拥有的注解元素。
+
+```sysml
+    dependency 'Service Layer'
+        to 'Data Layer', 'External Interface Layer' {
+        /* 'Service Layer' is the client of this dependency,
+        * not its name. */
+    }
+```
+
+### 注解
+#### 注解概述
+
+注解
+
+
+
+
+
