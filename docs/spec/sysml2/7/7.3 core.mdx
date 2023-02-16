@@ -63,3 +63,59 @@ abstract type A specializes Base::Anything;
 type A1 specializes A;
 type A2 specializes A;
 ```
+
+重数约束了在类型的范畴之内实例的数量（范畴的基数）。
+重数是一种特征，它的值是自然数（包括无穷大）；只有重数能用来作为它所表征的类型的基数（每一个重数只能是一种类型的特征）。
+一个类型最多只能有最多一个特征，作为它的重数。
+分类器的基数是它所分类的事物的数量。
+对于不是终点特征的特征，基数就是它所表征的类型的一个实例上，所具有的该特征的数量。
+
+**注意**：重数的语义对于*终点特征（end feature）*是不同的。
+终点特征主要是用在关联和连接器的定义中，其语义和它们一并讨论。
+
+类型的重数可以在该类型的，用方括号包裹。
+```sysml
+    // This Type has exactly one instance.
+    type Singleton[1] specializes Base::Anything;
+```
+
+类型的内容体和一般的命名空间一样，在大括号内列出了其成员。
+然而，对于类型，其*保护（protected）*成员（通过关键字`protected`标识）在继承时具有特殊的可见性规则。
+如果一个特征声明为类型的拥有成员，那么它就被自动认为是该类型的一个*拥有的特征（owned feature）*， 
+通过*特征从属关系（feature membership）*进行关联。如果在声明前使用关键字`member`，那么就使用普通的从属关系进行关联。
+
+```sysml
+type Super specializes Base::Anything {
+    private namespace N {
+        type Sub specializes Super;
+    }
+    protected feature f : N::Sub;
+    member feature f1 : Super featured by N::Sub;
+}
+```
+
+类型加在其实例上的条件(例如，具有那些特征)总是*必要（necessary）*的。
+通过在关键字`type`后面加上关键字`all`，这些条件可以变成*充分（sufficient）*的。 
+这种情况下，类型给它的实例附加了所有和必要条件相对应的充分条件。
+例如，如果`Car` 需要所有的实例都是四个轮子的（必要条件），并且将其设为充分条件，那么它的范畴里将只包含所有的四个轮子的所有事物。
+
+```sysml
+type all Car specializes MaterialThing {
+    feature wheels[4] : Wheel;
+}
+```
+
+#### 7.3.2.3 特化（specialization）
+*特化（specialization）*是类型之间的关系，通过指定*具体类型（specific）*和*一般类型（general）*，
+表示所有具体类型的实例，也是一般类型的实例（即，具体类型的范畴是一般类型范畴的子集）。
+这意味着具体类型的实例具有一般类型的所有特征，在语法上称为具体类型*继承（inherit)*了一般类型。
+一个类型可以有多个特化关系，既可以作为具体类型，也可以作为一般类型。
+
+特化关系通过关键字`specialization`来声明，后面可以添加简称和/或名称。
+类型的全称，
+TODO:
+
+#### 7.3.24 共轭
+
+*共轭（conjugation)*是类型之间的一种关系，通过指定*原始（original）*类型和*共轭（conjugated）*类型，
+表示共轭类型从原始类型继承可见的和保护成员，但是输入和输出特征的方向被反转。
