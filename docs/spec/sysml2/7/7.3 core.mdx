@@ -119,3 +119,46 @@ TODO:
 
 *共轭（conjugation)*是类型之间的一种关系，通过指定*原始（original）*类型和*共轭（conjugated）*类型，
 表示共轭类型从原始类型继承可见的和保护成员，但是输入和输出特征的方向被反转。
+原始类型中具有方向`in`的特征，在共轭类型中被认为具有方向`out`。
+没有方向，或者方向为`inout`的特征则被无改变的继承下来。
+
+共轭关系通过关键字`共轭`声明，后面可以跟一个简称或名称。
+共轭类型（或者特征链）的全称，写在关键字`conjugate`之后，
+再后面是关键字`conjugates`和原始类型（或者特征链）的全称。
+关键字`conjugates`可以用符号`~`来代替。
+共轭的声明可以具有关系内容体，用于包含嵌套的注解。
+
+```sysml
+    type Original specializes Base::Anything {
+        in feature Input;
+    }
+    type Conjugate1 specializes Base::Anything;
+    type Conjugate2 specializes Base::Anything;
+    conjugation c1 conjugate Conjugate1 conjugates Original;
+    conjugation c2 conjugate Conjugate2 ~ Original {
+        doc /* This conjugation is equivalent to c1. */
+    }
+```
+
+如果没有写简称或者名称，那么关键字`conjugation`可以被省略。
+```sysml
+    conjugate Conjugate1 conjugates Original;
+    conjugate Conjugate1 ~ Original;
+```
+
+TODO:
+
+一个类型最多只能是一个共轭关系中的共轭类型，而且一个共轭类型不能作为任何特化关系中的具体类型。
+
+#### 7.3.2.5 互斥
+
+由*互斥（disjoining）*关系关联的类型没有共同的实例（实例不能同时出现在两个以上的范畴内；这些范畴是互斥的）。
+例如，哺乳动物类型和矿物质类型是互斥的，人的父母特征和人的子女特征是互斥的。
+
+TODO:
+
+#### 7.3.2.6 特征从属
+
+*特征从属*是类型和特征之间的关系，它既是一种所有从属关系，又是一种类型表征。
+通过特征从属关系关联到类型上的特征，称为该类型所*拥有的特征（owned features）*。
+所属类型是该特征所表征的
