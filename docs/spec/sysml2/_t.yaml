@@ -7,3 +7,6 @@ t:
   representation: 表示
   featuring: 表征
   annotation: 注解
+  unioning: 合并
+  intersecting: 交叉
+  differencing: 
