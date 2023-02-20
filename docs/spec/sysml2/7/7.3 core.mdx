@@ -203,3 +203,82 @@ TODO:
 
 *合并（Unioning)*, *交叉（intersecting）*和*（differencing）*是一个拥有类型和一组其他类型之间的关系。
 
+  1. *合并*表示所属类型将其任一合并的类型所分类的事物分类。
+  2. *交叉*表示所属类型分类的事物，是由其所有的交叉类型所分类的事物。
+  3. *差*表示
+
+由于这些关系总是被源类型所拥有，它们就通过关键字`unions`，`intersects`,`differences`作为该类型声明的一部分而定义,
+后面跟着一组关联类型的限定名称（或者特征链）。
+这些关系语句写在所拥有的特化之后，但是相互之间以及和互斥语句之间的顺序是任意的。
+
+```sysml
+    classifier Adult;
+    classifier Child;
+
+    classifier  Person unions Adult, Child {
+        feature dependents : Child[*];
+        feature offspring : Person[*];
+        feature grownOffspring : Adult[*] :> offspring;
+        feature dependentOffspring : Child[*] :> dependents, offspring
+            differences offspring, grownOffspring
+            intersects dependents, offspring;
+    }
+```
+
+每一种的多条关系可以在一个声明里使用多个从句来指定。
+在差集的情况下，在第一个`differences`从句后面的从句表示所属类型都不对任一相关类型所分类的事物进行分类。
+但是，不允许一个类型只存在一条某种关系。
+
+```sysml
+    // 有效
+    classifier Person unions Adult unions Child;
+
+    // 无效
+    classifier Person unions Adult;
+```
+
+### 7.3.3 分类器
+
+#### 7.3.3.1 分类器概述
+
+*分类器（classifier）*是对所建模系统中的事物进行分类的类型，
+它和特征不同，特征是对事物之间的关系进行建模。
+*子分类（subclassification）*是一种特化，仅在分类器之间存在。
+
+#### 7.3.3.2 分类器声明
+
+TODO:
+
+#### 7.3.3.3 子分类
+
+子分类关系通过关键字`specialization`声明，后面可以跟着简称或/和名称。
+*子分类器（subclassifier）*的限定名称在关键字`subclassifier`之后给出，
+后面跟着关键字`specializes`以及*父分类器（superclassifier)*的限定名称。
+符号`:>`可以用来代替关键字`specializes`。
+子分类的声明可以具有关系内容体，来包含内嵌的注解等。
+
+```sysml
+    specialization Super subclassifier A specializes B;
+    specialization subclassifier B :> A {
+            /* 该子分类没有命名。*/
+    }
+```
+
+如果没有给出简称或者名称，那么关键字`specialization`可以被省略。
+
+```sysml
+    subclassifier C specializes A;
+    subclassifier C specializes B;
+```
+
+分类器所拥有的子分类定义为分类器声明的一部分，而不是用一个单独的声明。
+在关键字`specializes`（或者符号`:>`)之后，加上父分类器的受限名称的列表。
+
+```sysml
+    classifier C specializes A, B;
+```
+
+
+### 7.3.4 特征
+
+#### 7.3.4.1 
