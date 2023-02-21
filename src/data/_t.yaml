@@ -6,7 +6,8 @@ t:
   membership: 从属
   representation: 表示
   featuring: 表征
-  annotation: 注解并
+  annotation: 注解
   unioning: 合并
   intersecting: 交叉
-  differencing: 
+  differencing: 。
+  feature typing: 特征赋型

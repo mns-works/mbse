@@ -278,7 +278,86 @@ TODO:
     classifier C specializes A, B;
 ```
 
-
 ### 7.3.4 特征
 
-#### 7.3.4.1 
+#### 7.3.4.1  特征概览
+
+*特征（feature)*属于类型，用来对所建模系统中事物之间的关联进行分类，
+包括通过关系链。
+事物之间的关系也可以看做是事物，从而允许在关系之间建立关系，实现不限次数的递归。
+特征将它所表征类型（本域，*domain*）范畴中的实例和featured type？？(协域，*co-domain*)相关联。
+特征的本域中的实例，被称为*有值*，这些值是协域中的实例。
+没有显示指定表征类型的特征的本域，是`Base`模型库中的类型`Anything`。
+
+*类型表征（type featuring)*是特征和类型之间的关系，表示类型是特征的一个*表征类型（featuring type）*。
+*特征从属（feature membership)*既是一种所属的从属关系，也是一种类型表征；通过特征从属关系，
+一个类型拥有某个特征，并且称为该特征的一个表征类型。
+
+对于特征，存在几种特殊类型的特化。
+
+  - *特征赋型（feature typing)* 是特征和类型之间的关系，表示类型是特征的一个*featured type*。 
+  - *构造子集（subsetting）*是一个具体特征和一个一般特征之间的关系，其中具体特征可以进一步约束一般特征的表征类型、featured type，以及重数。
+  - *重定义（redefinition）*是构造子集的一种，其中具体类型（重定义特征，*redefining feature*)在其所属类型的上下文中，
+    将一般特征（被重定义的特征，*redefined feature*）替换掉，而不是继承下来。
+
+> 在一个上下文里，只能有一个重定义特征，但是子集特征可以有多个。
+
+#### 7.3.4.2 特征声明
+
+TODO:
+
+#### 7.3.4.3 特征赋型
+
+特征赋型关系使用关键字`specialization`来声明，后面可以添加简称和名称。
+被赋型的特征的限定名称在关键字`typing`之后给出，后面是关键字`typed by`，跟着类型（或者特征链）的限定名称。
+符号`:`可以用来代替关键字`typed by`。 
+特征赋型的声明也可以具有关系内容体，用来写内嵌的<T annotation />。
+
+```sysml
+    specialization t1 typing customer typed by Person;
+    specialization t2 typing employer : Organization {
+            doc /* 雇佣者是组织 */
+    }
+```
+
+如果没有给出简称或者名称，那么关键字`specialization`可以省略。
+
+```sysml
+    typing customer typed by Person;
+    typing employer : Organization;
+```
+
+如果一个特征赋型是它的被赋型的特征的拥有的关系，那么称为拥有的特征赋型。
+定义方式为
+
+```sysml
+    feature foodItem typed by Food, InventoryItem;
+```
+
+#### 7.3.4.4 子分类
+
+子分类是两个特征之间的一种特化。
+
+子分类关系通过关键字`specialization`来声明，后面可以添加简称或/和名称。
+TODO:
+
+```sysml
+    specialization Sub subset parent subsets person;
+    specialization subset mother subsets parent {
+        doc /* 所有的母亲都是父母 */
+    }
+```
+
+如果没有给出简称或者名称，那么关键字`specialization`可以省略。
+
+```syml
+    subset rearWheels subsets wheels;
+    subset rearWheels subsets driveWheels;
+```
+
+TODO:
+
+
+#### 7.3.4.5 重定义（redefinition）
+
+TODO:
