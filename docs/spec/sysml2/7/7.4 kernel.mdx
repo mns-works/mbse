@@ -6,3 +6,308 @@ Kernel层将KerML构建完成。
 包括事物的特化的分类器：具有数据值语义的元素（数据类型，*data type*)，
 在时空维度具有独立存在的事物（类，*class*），以及事物之间的具体的关系（关联，*association*）。 
 
+类的实例是在时间和空间中存在或者发生的事物，分为*结构（structure）*和*行为（behavior）*。
+结构通常限制了事物以及事物之间的关系如何随时间可能发生的变化，
+而行为指定了在这些限制之内的变化。
+结构和行为不会重叠，但是结构可以参与、执行以及拥有行为。
+行为可以通过*步骤（step，行为的使用）*和其他的行为进行协作。
+*函数（function）*是产生单一结果的行为，可以用来组成*表达式（expression）*树。
+交互将行为和关联组合起来。
+某些关联也是结构。
+
+Kernel层主要通过指定模型元素如何使用Kernel模型库来对Core层添加语义，
+而不是像在Core层一样通过数学的方式指定。
+最简单的例子是，Kernel的文本表达式引入了一些关键字，TODO:
+这些关键字将,作为建模模式的语法“标记”将Kernel和Core连接起来。
+其中最简单的例子是，引入了模型库中类型的隐式特化。
+例如，类必须直接或间接地对库中的类`Object`进行子分类，
+而行为必须直接或间接地对库中的类`Performance`进行子分类。
+某些情况下，需要更复杂的复用模式。
+例如，二元关联对库中的`BinaryLink`进行特化，并且需要关联的端对`BinaryLink`的`source`端和`target`端进行重定义。
+
+这也是其他的建模语言如何基于KerML构建的方式。
+领域特定的元模型和库可以复用Kernel的元模型和库，继承上述的库复用的模式，
+也包括它们从Core继承下来的数学语义。
+这使得领域特定的建模者能够使用熟悉的术语和表达式，同时仍然从数学定义的语义得到的自动支持中获益。
+
+### 7.4.2 数据类型
+
+*数据类型（data type)*是对*数据值（data value)*进行分类的分类器。
+特定的*基本（primitive）*数据类型已经制定了值的范畴，例如`ScalarValues`库模型中的数字和其他类型。
+其他的数据类型具有特征，这些特征的值在该数据类型的不同实例中是可以区分的。
+但是，不同的数据值本身是不可区分的。
+
+这意味着数据类型不能同时是类，或者关联，也不能和它们共享实例。
+这也意味着数据类型对不存在于时间或者空间中的事物进行分类，因为这些事物和其他事物之间的关系需要发生变化。
+数据值的特征的值不能随时间发生变化，因为不同的不同的特征值将表示不同的数据值。
+
+数据类型作为一个分类器，通过关键字`datatype`声明。
+如果没有显式的给出一个父类，那么将默认把`Base`库模型中的数据类型`DataValue`作为它的父类。
+
+如果一个特征的类型有一个是数据类型，那么该特征的所有类型都必须是数据类型。
+如果一个特征的类型是数据类型，且在特征声明中没有显式地给出拥有的子集或者拥有的重定义，
+那么该特征就隐式地作为`Base`库模型中的特征`dataValues`的一个子集。
+
+```sysml
+    datatype IdNumber specializes ScalarValues::Integer;
+    datatype Reading { // 默认是 Base::DataValue 的子类
+        feature sensorId : IdNumber;  // 默认是 Base::dataValues 的子集
+        feature value : ScalarValues::Real;
+    }
+```
+
+### 7.4.3 类
+
+*类（class）*是对*实存（occurrence）*进行分类的分类器，即在时间和空间中存在的事物。
+实存和其他事物之间的关系可以随着时空变化而变化，而实存本身则保持了独立的一致性。
+
+类使用关键`class`声明为一个分类器。
+如果没有显式地给出父类，那么`Occurrences`库模型中的`Occurrence`类将隐式地作为它的父类。
+
+如果一个特征的类型有任一个是类，那么它的所有类型都必须是类。
+如果一个特征具有类作为类型，且在特征声明中没有显式地给出拥有的子集或者拥有的重定义，
+那么该特征就隐式地作为`Occurrences`库模型中的特征`occurrence`的子集，
+除非它的类型中至少有个是关联结构，这种情况的默认子类在7.4.5中详述。
+
+```sysml
+    class Situation { // 默认特化 Occurrences::Occurrence
+        feature condition : ConditionCode;
+        feature soundAlarm : ScalarValues::Boolean;
+    }
+
+    class SituationStatusMonitor specializes StatusMonitor {
+        feature currentSituation[*] : Situation; // 默认是 Occurrences::occurrences 的子集
+    }
+```
+
+### 7.4.4 结构
+
+*结构（structure）*是把*对象（objects）*进行分类的类，属于实存的一种。
+结构通常限制了它们的实例以及之间的关系随时间发生变化的方式，而行为是表明了对象和之间的关系是如何变化的。
+
+结构使用关键字`struct`声明为一个分类器。其默认父类是`Objects`库模型中的结构`Object`。
+
+如果一个特征的任一类型是结构，那么它的所有类型都必须是结构。
+如果一个特征的类型是结构，且在特征声明中没有显式地给出拥有的子集或者拥有的重定义，
+那么该特征就隐式地作为`Objects`库中的特征`objects`的子集，
+除非至少有一个类型是关联结构，此种情况详见7.4.5.
+
+```sysml
+    stuct Sensor { // 默认特化 Objects::Object
+        feature id : IdNumber;
+        feature currentReading : ScalarValues::Real;
+        step updateReading { ... } 
+    }
+    struct SensorAssembly specializes Assembly {
+        composite feature sensors[*] : Sensor;  // 默认是 Objects::objects 的子集
+    }
+```
+
+### 7.4.5 关联
+
+*关联（association）*是对事物之间的*连接（link）*进行分类的分类器。 
+关联必须至少有两个拥有的特征是端特征，即*关联端（association end）*，
+用来指定每个连接所连接的事物（每个端一个事物，两端可能是同一个事物）。
+只具有两个关联端的关联称为*二元关联（binary association）*。 
+关联也可以拥有不是端特征的特征，用来区分它所连接的事物的关联的实例。
+
+关联使用关键字`assoc`声明为一个分类器。 
+其默认的父类或者是`BinaryLink`关联（如果是二元关联），或者是`Link`关联（非二元关联），二者都来自于`Links`库模型。
+
+关联也是它的关联端的类型之间的一种关系，通过它的*相关类型（related types）*来指定。
+连接存在于一个关联的相关类型的实例之间。
+对于二元关联，两个相关类型被认为是*源类型（source type)*和*目标类型（target）*，二者可能相同。
+具有多个关联端（n元）的关联只有目标类型，没有源类型。
+
+重数的语义对于端特征和对于非端特征不同。
+关联的端特征决定了连接中的*参与者（participants）*，因此，实际上相对于关联的重数为1。
+但是，如果一个关联端的重数不是`1..1`，那么其含义如下：
+对于每一个关联端，TODO:
+
+如果一个关联具有一个关联作为其单一父类，它可以从这个父类中继承关联端。
+然而，如果其声明了任何所拥有的关联端，那么每一个关联端必须按顺序重定义父类中的一个关联端，
+直到和父类中的关联端的数量相同。
+如果对于拥有的关联端没有显式地指定重定义，那么认为它隐式地重定义了父类中位于同样位置的关联端。
+
+```sysml
+    assoc Ownership { // 默认特化了 Links::BinaryLink
+        feature valuationOnPurchase : MonetaryValue; 
+        end feature owner[1..*] : LegalEntity;  // 重定义了 BinaryLink::source
+        end feature ownedAsset[*] : Asset; // 重定义了 BinaryLink:target
+    }
+    assoc SoleOwnership specializes Ownership {
+        end feature owner[1]; // 重定义了 Ownership::owner
+        // 继承了 ownedAsset 
+    }
+```
+
+如果一个关联具有多个类型是关联的父类，那么该关联*必须*定义至少和它的父类中拥有关联端的最大数量相同的关联端。
+每个关联端必须对每一个父类中位于相同位置的关联端进行重定义。
+
+*关联结构（association structure）*既是关联，又是类，用来对*连接对象（link objects)*进行分类。
+作为对象，连接对象可以创建，也可以销毁，它们的非端特征可以随时间而变化。
+然而，连接对象的端特征的值是固定的（是只读的），在整个生命周期内不能变化。
+
+关联特征的声明和一般的关联类似，但是使用关键字`assoc struct`。 
+关联结构必须直接或间接地特化基础关联结构`LinkObject`。 
+如果在声明中显式地通过`ownedSuperclassifications`给出了父类，TODO:
+上面所述的对于关联端的规则也同样适用于关联结构。
+关联结构可以特化一个不是关联结构的关联，但是关联结构的所有子类必须是关联结构。
+
+```sysml
+    // 隐式地特化了 Objects::BinaryLinkObject
+    assoc struct ExtendedOwnership specializes Ownership {
+        // 
+        feature revaluations[*] ordered : MonetaryValue;
+    }
+```
+
+如果一个特征具有一个或多个关联作为类型，那么这些关联必须具有相同数量的关联端。
+TODO:
+
+如果
+
+### 7.4.7 行为
+#### 7.4.7.1 行为概览 
+
+*行为（behavior）*是对*表现（performance）*进行分类的类， 表现是可以在时空的不相连的组分中进行扩散的实存。
+行为的表现可以导致其他事物上出现影响，包括包括它们的存在以及关系，
+某些影响可以作为行为的输入被接受，或者作为输出提供出去。
+
+行为可以具有*步骤（step）*；步骤是以行为作为类型的特征，允许包含的行为和其他行为的表现进行协作。
+步骤可以使用次序连接器表示时间上的先后顺序，
+也可以使用项目流来表示一个步骤的输出到另一个步骤的输入之间的流动。
+步骤也可以嵌套其他的步骤，来增强或者重定义从其行为类型中继承下来的步骤。
+
+#### 7.4.7.2  行为声明
+
+行为使用关键字`behavior`声明为一个分类器。
+如果未显式给出父类，那么隐式地使用`Performances`库模型中的行为`Performance`作为父类。 
+
+在行为的内容体中定义的带有非空方向的特征被认为是该行为所拥有的`参数（parameter)`。 
+方向为`in`的特征是输入参数，方向为`out`的是输出参数，
+方向为`inout`的既是输入又是输出参数。
+
+```sysml
+    // 默认特化 Performances::Performance
+    behavior TakePicture {
+        in scene : Scene;
+        out picture : Picture;
+    }
+```
+
+参数的顺序和其在行为内容体中的声明的顺序是一致的，它们可以出现在内容体重的任意位置。
+
+如果行为具有拥有的子分类，其中的父类是行为，
+那么该行为的每一个拥有的参数必须按顺序重定义每一个父类行为中位于同样位置的参数。
+重定义参数应该和被重定义的参数具有相同的方向。
+
+```sysml
+    behavior A { in a1; out a2;}
+    behavior B { in b1; out b2;}
+    behavior C specializes A, B {
+        in c1 redefines a1, b1;
+        out c2 redefines a2, b2;
+    }
+```
+
+如果行为具有单一的行为父类，那么该子类行为可以声明比父类行为的参数数量更少的拥有的参数，
+而从父类继承其他的参数（在拥有的参数后面按顺序继承）。
+如果有多个行为父类，那么每一个父类中的每一个参数都必须被子类的拥有的参数所重定义。
+如果每一个每一个父类的参数已被重定义，那么该子类行为也可以定义额外的参数，
+排在重定义参数之后。
+如果对参数没有显式地给出重定义，那么就会隐式地创建一个拥有的重定义，来重定义父类参数，以满足上述规则。
+
+```sysml
+    behavior A1 :> A { in aa; } // aa 重定义了 A::a1, A::a2 被继承下来  
+    behavior B1 :> B { in b1; out b2; inout b3; } // 隐式地重定义
+    behavior C1 :> A1, B1 { in c1; out c2; inout c3; }
+```
+
+在行为的内容体中定义的步骤是行为的所拥有的步骤。
+行为也可以从父类行为中继承或者冲动已非私有步骤。
+
+```sysml
+    behavior Focus { in scene : Scene; out image : Image; }
+    behavior Shoot { in image : Image; out picture : Picture; }
+    behavior TakePicture {
+        in scene : Scene;
+        out picture : Picture;
+        composite step focus : Focus;
+        composite step shoot : Shoot;
+    }
+```
+
+尽管行为的表现随时间而发生，但是步骤的声明顺序对于步骤在时间上的表现顺序没有任何影响。
+步骤的时间顺序，或者之间的连接，必须显式地指定。
+
+```sysml
+    behavior TakePicture {
+        in scene : Scene;
+        out picture : Picture;
+
+        binding focus.scene = scene;
+        composite step focus : Focus;
+        succession focus then shoot;
+        composite flow focus.image to shoot.image;
+        composite step shoot : Shoot;
+        binding picture = focus.picture;
+    }
+```
+
+#### 7.4.7.3 步骤声明
+
+步骤通过关键字`step`声明为一个特征。
+默认作为`Performances`库模型中的特征`performances`的子集。
+
+作为一个行为，在步骤的内容体中声明的有向特征被看做是步骤的参数。
+如果步骤所拥有的特化（包括所有的特征赋型，子集，重定义）的一般类型是行为或者步骤，
+那么这个行为或者步骤的参数的重定义规则和子类行为对父类行为的参数进行重定义的规则一致。
+
+```sysml
+    step focus : Focus {
+        // 重定义了Focus中的参数
+        in scene;
+        out image;
+    }
+    // 参数被隐式地继承
+    step refocus subsets focus;
+```
+
+步骤可以具有内容体，其中可以包含其他的步骤。
+步骤可以对它的行为类型或者它的父集步骤中的步骤进行继承或者重定义。
+```sysml
+    step takePictureWithAutoFocus : TakePicture {
+        in feature unfocusedScene redefines scene;
+        step redefines focus : AutoFocus;
+        out feature focusedPicture redefines picture;
+    }
+```
+
+### 7.4.8 函数
+
+#### 7.4.8.1 函数概述
+
+*函数（function）*是具有一个输出参数（称为结果参数）的行为。
+函数对*求解（evaluation）* 进行分类，求解是表现的一种，其产生作为结果参数的*结果（result）*值。
+和所有行为一样，函数可以改变事物，称为`副作用（side effects)`。 
+没有副作用并且在给定输入下总是产生相同结果的函数称为*纯（pure）*函数，和数学意义上的函数一样。
+例如，在Kernel Function Library 中的数值函数都是纯函数。
+
+*表达式（expression）*是由单一函数作为类型的步骤，意味着它们的值是求解。
+如果一个表达式的值是一个具有结果的求解，那么称为*求解为（evaluate to)*这些结果。
+表达式可以作为任意行为的步骤，但是在函数中，可以指定其中一个表达式步骤作为*结果表达式（result expression)*,
+给出结果参数的值。
+表达式可以自己的内嵌参数，以增强或者重定义对应的函数中的参数，包括结果参数。
+表达式也可以拥有其他的表达式，并且和函数一样指定一个结果表达式。
+
+*断言（predicate）*是结果为一个布尔值（真或假）的函数。
+断言在求解时，判断其输入参数是否满足特定的条件，如果满足，返回真，否则返回假。
+断言对*布尔求解（boolean evaluation）*进行分类，布尔求解是返回布尔值的特殊求解。
+
+*布尔表达式（boolean expression)*是函数类型为断言的表达式，因此求解为一个布尔值。
+布尔表达式一般会有时求解为真，有时求解为假。
+但是一个*不变式（invariant）*是一种总是求解为真或者假的布尔表达式。
+默认情况下，一个不变式总是求解为真，而一个*反不变式（negate invariant）*总是求解为假。
+
+#### 函数声明
