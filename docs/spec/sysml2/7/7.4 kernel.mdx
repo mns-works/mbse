@@ -310,4 +310,109 @@ TODO:
 但是一个*不变式（invariant）*是一种总是求解为真或者假的布尔表达式。
 默认情况下，一个不变式总是求解为真，而一个*反不变式（negate invariant）*总是求解为假。
 
-#### 函数声明
+#### 7.4.8.2 函数声明
+
+TODO:
+
+```sysml
+    function Velocity {
+        in v_i : VelocityValue;
+        in a : AccelerationValue;
+        in dt : TimeValue;
+        return v_f : VelocityValue;
+    }
+```
+
+#### 7.4.8.3 表达式声明
+
+TODO:
+#### 7.4.8.4 断言声明
+
+```sysml
+    predicate isAssembled {
+        in assembly : Assembly;
+        in subassemblies[*] : Assembly;
+    }
+```
+
+```sysml
+    predicate isFull {
+        in tank : FuelTank;
+        tank.fuelLevel == tank.maxFuelLevel;
+    }
+```
+
+TODO:
+#### 7.4.8.5 布尔表达式和不变式声明
+
+TODO:
+```sysml
+    class FuelTank {
+        feature fuelLevel : Real;
+        feature readonly maxFuelLevel : Real;
+        bool isFull { fuelLevel == maxFuelLevel }
+    }
+```
+
+```sysml
+    class FuelTank {
+        feature fuelLevel : Real;
+        feature readonly maxFuelLevel : Real;
+        inv { fuelLevel >= 0 & fuelLevel <= maxFuelLevel>}
+    }
+```
+
+### 7.4.9 表达式
+
+#### 7.4.9.1 表达式概述
+
+如 7.4.8 中所述，表达式是类型为函数的步骤，7.4.8.3节中覆盖了一般的声明表达式的方法。
+然而，表达式通常具有树状的组织结构，以表达式作为节点，每一个表达式的输入参数绑定到它每一个子表达式的结果上。
+KerML具有大量的文本标记，用来构建表达式树，包括用在Kernel模型库中的函数中的传统的操作符记号。
+
+
+  - 表达式树上的非叶节点是*调用表达式（invocation expression）*， 
+    这是一种将其他表达式（*参数，argument*表达式）的结果作为它的输入值的表达式，
+    依次作为它所调用的函数的输入参数。
+  - 树的边是调用表达式的输入参数和它的参数表达式的结果之间的绑定连接器。
+  - 叶子节点是以下几种表达式：
+     - *特征引用表达式（feature reference expression)* 求解为一个不属于表达式树一部分的一个引用特征的值。
+     - *字面量表达式（literal expression)*求解为一个字面量值，类型为`ScalarValues`库模型中的基础数据类型。
+     - *空值表达式（null expression)* 求解为空集。
+
+一个表达式也可以作为表达式中一个特征引用表达式中的引用。
+这使得引用的表达式对应的求解本身可以作为调用的参数值，而不是将求解的*结果（result）*的值传递过去。
+为实现上述用法的简写，表达式内容体的具象语法可以作为表达式语法书中的一个叶子节点。
+
+一个*模型层面可求解（model-level evaluable）*的表达式是引用元数据的表达式，
+元数据是关于模型元素而非所建模事物的数据。
+模型层面可求解的表达式可以给出元数据特征的值，作为包中元素的过滤条件。
+模型层面可求解的表达式的 
+
+  - 所有的空值表达式，字面量表达式和特征引用表达式都是模型层面可求解的。
+  - 所有的调用表达式如果满足以下条件，则是模型层面可求解的：
+    1. 所有参数表达式都是模型层面可求解的。
+    2. 调用在表格5和表格7中列出的函数（这些函数是模型层面可求解的）。
+
+#### 7.4.9.2 操作符表达式
+
+*操作符表达式（operator expression）*的书写形式为调用库函数中表示为一个*操作符符号（oprator symbol）*的表达式提供了简写形式。
+TODO:
+
+
+#### 7.4.9.3 基础表达式
+
+TODO:
+
+#### 7.4.9.4 base expression
+
+TODO:
+
+#### 7.4.9.5 字面量表达式 
+*字面量表达式（literal expression)* 给顶一个词法上的字面量作为表达式的值。
+TODO:
+
+### 7.4.10 交互
+
+#### 7.4.10.1 交互概述
+
