@@ -416,3 +416,36 @@ TODO:
 
 #### 7.4.10.1 交互概述
 
+*交互（interaction）*既是关联，又是行为，用来对既是实存之间的连接又是performance 事物进行分类。
+它们指明所连接的参与者如何相互影响和协作。
+
+*转换（transfer）*是在两个参与者之间从一个实存到另一实存转移项目的交互，
+这些项目可以分别由源和目标实存的输出和输入特征指定。
+
+*项目流（item flow）*既是二元连接器，又是步骤，它们的值是转换。
+项目流有时可以确保项目从连接的源特征的输出特征到目标特征的输入特征进行传输。
+*次序项目流（succession item flow)*既是次序连接器，又是项目流，
+表明转移发生在源之后（即发生在项目来源实存结束之后），而在目标之前（即发生在项目流向实存开始之前）。
+
+#### 7.4.10.2 交互声明
+
+交互使用关键字`interaction`声明为一个行为。
+其默认子类为`Performances`库模型中的`Performance`,*以及*`Links`库模型中的关联`BinaryLink`或者`Link`，
+取决于它是否是二元交互。
+
+作为一种行为，如果交互有拥有的子分类，且子分类中的父类是行为，
+那么它们的参数相关的规则和子类行为一样。
+作为一种关联，交互的内容体中必须声明至少两个关联端。
+如果交互所拥有的父类中，有父类是关联的，那么它们的关联端相关的规则和一样。
+
+```sysml
+    interaction Authorization {
+        end feature client[*] : Computer;
+        end feature server[*] : Computer;
+        composite step login;
+        composite step authorize;
+        composite succession login then authorize;
+    }
+```
+
+
