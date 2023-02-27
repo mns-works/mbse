@@ -448,4 +448,135 @@ TODO:
     }
 ```
 
+#### 7.4.10.3 项目流声明
 
+TODO:
+
+```sysml
+    struct Vehicle {
+        composite feature fuelTank[1] {
+            out featur fuelOut[1] : Fuel;
+        }
+        composite feature engine {
+            in feature fuelIn[1] : Fuel;
+        }
+        flow fuelFlow from fuelTank::fuelOut to engine::fuelIn;
+    }
+```
+
+项目流的声明也可以在关键字`of`后面显式地包括所传输的项目的类型和/或重数。
+这表明该项目流传输的所有项目都具有所声明的类型。
+如果没有项目的声明，任何和源的输出以及目标的输入特征的类型相一致的值，都可以通过该项目流传输。
+
+```sysml
+    flow of flowingFuel : Fuel from fuelTank.fuelOut to engine.fuelIn;
+```
+
+TODO:
+
+### 7.4.11 特征值
+
+*特征值（feature value）*是在一个所属特征和一个*值表达式（value expression)*之间的从属关系，
+其中值表达式的结果提供了此特征的值。
+特征值关系可以是*bound*或者*initial*，同时，也可以是*concrete*或者*default*。 
+一个特征最多只能有一个特征值关系。
+
+一个确定的、绑定的特征值关系通过在符号`=`后面加上使用具象语法书写的值表达式来声明。
+这些记号附加在特征值所拥有的特征的声明之后。
+
+
+```sysml
+    feature monthsInYear : Natural = 12;
+    struct TestRecord {
+        feature scores[1..*] : Integer;
+        derived feature averageScore[1] : Rational = sum(scores)/size(scores);
+    }
+```
+
+ 具有这种形式的特征值关系的特征，都隐式地有一个在特征和值表达式的结果之间的内嵌绑定连接器，
+ 该绑定连接器的表征类型和所声明的特征一样。
+
+ **注意**：绑定的语义意味着这种特征值表明了一个特征和值表达式的结果是*相等的（equivalent）*。 
+ 为了强调这一点，具有这种特征值的特征可以标记为`导出的（derived）`
+ （尽管这不是必须的，而且一个导出的特征值使用一个特征值计算得到也不是必须的）。
+
+ 一个确定的、初始的特征值关系和上述的声明方式一样，只是使用符号`:=`代替`=`。 
+
+ ```sysml 
+    feature count[1] : Natural := 0;
+```
+这种情况下，这个特征也有一个隐式地内嵌绑定连接器，
+但是绑定连接器的表征类型是所声明特征的表征类型的*起始快照（starting snapshot)*。 
+也就是说，值表达式的结果作为声明特征的初始值，但是和绑定值的情况不同，
+这些初始值后续可能发生变化。
+
+默认特征值关系的声明和上述类似，但是使用关键字`default`。根据是绑定值还是初始值，
+分别跟在符号`=`或者`:=`后面。 
+但是，对于绑定特征值，default后面的`=`可以省略。 
+
+```sysml
+    struct Vehicle {
+        feature mass[1] : Real default 1500.0;
+        feature engine[1] : Engine default := standardEngine;
+    }
+    struct TestWithCutoff :> TestRecord {
+        feature cutoff[1] : Rational default = 0.75 * averageScore;
+    }
+```
+
+对于默认特征值关系，不会在特征声明中添加绑定连接器，
+但是在表征类型的实例构造的时候，如果没有显式地给定该特征一个值，那么就会应用默认值。
+
+TODO:
+
+### 7.4.12 重数
+
+重数是定义在Core层的一个特征，用来指定一个类型的基数（实例的数量），
+这种指定是通过将所有可能的基数数量枚举出来实现的。
+Kernel层提供了一种特定的方式来指定基数，即通过基数的*范围（range）*。 
+重数的范围具有*下界（lower bound）*和*上界（upper bound)* 表达式， 
+求解出的值分别确定最低和最高的基数，这两个值都是自然数（即`ScalarValues`库模型中的类型`Natural`）。
+上界值为`*`（无穷）意味着基数包括所有大于或者等于下界值的数字。
+
+重数范围的形式为`[lowerBound..upperBound]`，其中lowerBound和upperBound或者是
+一个字面量表达式，或者是一个特征引用表达式。
+字面量表达式可以用来指定具有固定下界和/或上界的重数范围。
+如果`lowerBound`表达式的结果是`*`，那么这个重数范围的含义是未确定的。
+
+重数猚也可以不写下界（或者`..`）。 
+这种情况下，单个的表达式的结果同时作为下界和上界，
+除非结果是无限值`*`，那么下界被认为是0。
+
+重数范围可以用在类型，特别是特征，的声明中。
+
+```sysml
+    struct Automobile {
+        feature n : Positive[1];
+        composite feature wheels : Wheel[n];
+        feature driveWheels[2..n] subsets wheels;
+    }
+    feature autoCollection : Automobile[*]; 
+```
+
+也可以使用关键字`multiplicity`来声明一个重数特征，后面可以跟着简称和/或名称，
+并且包括重数范围或者另外一个重数的子集。
+重数的声明是一种特征声明，也可以像一般的特征声明一样包括内容体。
+
+```sysml
+    multiplicity zeroOrMore [0..*];
+    multiplicity m subsets zeroOrMore;
+```
+
+如果重数特征声明在类型的内容体中，那么就自动称为该类型的重数。
+一个类型最多有一个重数，不管是在声明还是在内容体中给出。
+
+```sysml
+    feature driveWheels subsets wheels {
+        multiplicity [2..n];
+    }
+    feature autoCollection {
+        multiplicity subsets zeroOrMore;
+    }
+```
+
+### 7.4.13 元数据
