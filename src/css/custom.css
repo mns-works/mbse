@@ -37,3 +37,12 @@
 [data-theme='dark'] .docusaurus-highlight-code-line {
   background-color: rgba(0, 0, 0, 0.3);
 }
+
+.markdown  em{
+    color : #e06b6b;
+}
+.markdown code {
+  color : green;
+  border: none;
+  background-color: transparent;
+}
