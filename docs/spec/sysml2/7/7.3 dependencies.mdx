@@ -1,0 +1,31 @@
+---
+title: 7.3 依赖
+slug: 7.3 dependency
+---
+
+### 7.3.1 依赖概述
+
+*依赖（dependency）*是一种关系，存在于任意数量的客户（源）和供应者（目标）元素之间。
+供应者元素的变化，将可能造成客户元素的变化。
+
+依赖关系在表达元素之间的抽象的关系时很有用。
+例如，依赖可以用来表示架构栈的上层可能依赖于栈的底层。
+依赖也可以被扩展，以反应更具体的关系，例如精化。
+
+### 7.3.2 依赖声明
+
+依赖使用关键字`dependency`声明，后面可选地跟着一个`declaredShortName`和/或`declaredName`。 
+依赖的`客户`元素通过关键字`from`后面跟着的一组以逗号分割的限定名称列表给出。
+如果未给出`declaredShortName`或者`declaredName`，那么关键字`from`可省略。
+依赖的声明也可以具有内容体，包含此依赖通过注解关系所拥有的注解元素。
+
+```sysml
+    dependency Use
+        from 'Application Layer' to 'Service Layer';
+
+    dependency 'Service Layer'
+        to 'Data Layer', 'External Interface Layer' {
+            /* 'Service layer' 是依赖关系的客户元素，
+             * 而不是名称 */
+        }
+```
