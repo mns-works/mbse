@@ -1,0 +1,87 @@
+---
+title: 7.26 元数据
+slug: 7.26_metadata
+---
+
+*元数据使用（metadata usage）*是一种注解元素，可以用于定义具有建模者特定的属性的结构化元数据。
+这可以用来对一个模型添加工具特定信息，不同的工具可以用来执行功能或者处理模型；
+或者添加和某个项目或组织相关的领域特定的信息。
+元数据使用被单个*元数据定义（metadata definition）*所定义。
+如果定义本身没有内嵌的特征，那么元数据使用仅仅作为一个附着在被注解元素上的用户定义的语义标签。
+如果定义具有特征，那么元数据使用必须对所有特征提供值绑定，以指定被注解元素的元数据。
+
+<table>
+  <tr>
+    <th>元素</th>
+    <th>图形记号</th>
+    <th>文本记号</th>
+  </tr>
+  <tbody>
+    <tr>
+      <td>元数据</td>
+      <td>![g1](./_assets/metadata_graphic_1.png)</td>
+      <td>
+      </td>
+    </tr>
+
+  </tbody>
+</table>
+
+### 7.26.2 元数据定义和使用
+
+元数据定义的声明和项目定义类似，但是使用关键字`metadata def`。
+如果没有显式地给出`ownedSuperclassing`，那么其隐式地以`Metadata`库中的`MetadataItem`作为父类。
+
+```sysml
+    metadata def SecurityRelated;
+
+    metadata def ApprovalAnnotation {
+        attribute approved : Boolean;
+        attribute approver : String;
+    }
+```
+
+元数据使用通过关键字`metadata`（或者符号`@`）来声明，后面可选地跟着一个`nameId`和/或`name`,
+再后面是关键字`defined by`（或者符号`:`)以及正好一个KerML元类或者SysML元数据定义的限定名称。
+
+如果未给出`nameId`或者`name`，name关键字`defined by`（或者符号`:`)可以省略。
+元数据定义后的关键字`about`后面可以添加多个`annotatedElements`， 
+表示该元数据使用对每一个元素都有注解关系。
+
+```sysml
+    metadata securityDesignAnnotation : SecurityRelated about SecurityDesign;
+```
+
+如果指定的元类或者元数据定义有`特征（feature）`，那么元数据使用必须具有内容体，
+在其中通过引用使用对每一个特征进行重定义，并把它们和模型层面可求解的表达式进行绑定。
+这些内嵌的引用使用必须和其`metadataDefinition`的特征的名字相同，
+这样可以总是使用重定义的简写形式
+
+```sysml
+    metadata ApprovalAnnotation about Design {
+        ref :>> approved = true;
+        ref :>> approver = "John Smith";
+    }
+```
+
+关键字`ref`和/或`refefines`（或者符号`:>>`）可以省略。
+
+```metadata ApprovalAnnotation about Design {
+    approved = true;
+    approver = "John Smith";
+}
+
+```
+
+如果元数据使用是命名空间的一个拥有成员，那么其所注解的元素可以无需显式指定，
+这种情况下所包含的命名空间就是其所注解的元素。
+
+```part def Design {
+   @ApprovalAnnotation {
+    approved = true;
+    approver = "John Smith";
+   }
+}
+```
+
+
