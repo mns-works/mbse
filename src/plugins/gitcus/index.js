@@ -6,7 +6,7 @@ module.exports = function pluginGitcus(context, options) {
   const { repo, repoId, cateogry, cateogryId } = options
 
   return {
-    name: 'gitcus',
+    name: 'docusaurus-plugin-gitcus',
     // getClientModules() {
     //   return isProd ? [path.resolve(__dirname, '.')] : []
     // },

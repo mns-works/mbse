@@ -19,7 +19,7 @@
     "@mdx-js/react": "^1.6.22",
     "clsx": "^1.1.1",
     "doc-yaml-loader": "file:src/plugins/yaml-loader",
-    "gitcus-plugin": "file:src/plugins/gitcus",
+    "docusaurus-plugin-gitcus": "file:src/plugins/gitcus",
     "docusaurus-plugin-baidu-analytics": "^0.0.1",
     "prism-react-renderer": "^1.2.1",
     "react": "^17.0.1",

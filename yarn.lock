@@ -4492,6 +4492,9 @@ docusaurus-plugin-baidu-analytics@^0.0.1:
   resolved "https://registry.yarnpkg.com/docusaurus-plugin-baidu-analytics/-/docusaurus-plugin-baidu-analytics-0.0.1.tgz#dbe697b85df14c9e3dce693d87dee639f435131b"
   integrity sha512-I2Y6BzXIRWyjaBqE/YHFulyShz51tvI3zXK3Fm5ZG1Yk+iy43WMTqQFwNGUlTOdtIAnyNl3CNRJMOdzdL/X7ug==
 
+"docusaurus-plugin-gitcus@file:src/plugins/gitcus":
+  version "0.0.0"
+
 dom-converter@^0.2.0:
   version "0.2.0"
   resolved "https://registry.yarnpkg.com/dom-converter/-/dom-converter-0.2.0.tgz#6721a9daee2e293682955b6afe416771627bb768"

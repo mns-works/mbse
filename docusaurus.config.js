@@ -53,7 +53,18 @@ const config = {
             type: 'doc',
             docId: 'intro',
             position: 'left',
-            label: '文档',
+            label: '系统工程',
+          },
+          {
+            type: 'doc',
+            docId: '体系工程/intro',
+            position: 'left',
+            label: '体系工程',
+          },
+          {
+            to: '/blog',
+            position: 'left',
+            label: '文章',
           },
           // { to: '/blog', label: '博客', position: 'left' },
           // {
@@ -117,16 +128,15 @@ const config = {
     [
       'docusaurus-plugin-baidu-analytics',
       { analyticsId: '9a94f478ef002ccb2a35f556aba3f9f4' },
-      
     ],
     [
-      'gitcus',
+      'docusaurus-plugin-gitcus',
       {
         repo: 'mns-works/mbse',
         repoId: 'R_kgDOG8abwQ',
         cateogry: 'announcements',
         cateogryId: 'DIC_kwDOG8abwc4CU4yn',
-      }
+      },
     ],
 
     'doc-yaml-loader',
