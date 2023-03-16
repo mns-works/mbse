@@ -62,6 +62,12 @@ const config = {
             label: '体系工程',
           },
           {
+            type: 'doc',
+            docId: 'resources/index',
+            position: 'left',
+            label: '资料',
+          },
+          {
             to: '/blog',
             position: 'left',
             label: '文章',
