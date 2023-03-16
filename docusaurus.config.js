@@ -117,6 +117,16 @@ const config = {
     [
       'docusaurus-plugin-baidu-analytics',
       { analyticsId: '9a94f478ef002ccb2a35f556aba3f9f4' },
+      
+    ],
+    [
+      'gitcus',
+      {
+        repo: 'mns-works/mbse',
+        repoId: 'R_kgDOG8abwQ',
+        cateogry: 'announcements',
+        cateogryId: 'DIC_kwDOG8abwc4CU4yn',
+      }
     ],
 
     'doc-yaml-loader',
