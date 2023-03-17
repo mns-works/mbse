@@ -1,0 +1,42 @@
+---
+title: 8.2 具象语法
+slug: 8.2_concrete_syntax
+draft: true
+---
+
+## 8.2 具象语法
+
+### 8.2.1 具象语法概述
+
+KerML 的具象语法是一种文本记号，用来表达或者构建模型的抽象语法表示。
+KerML 文本记号的*词法结构* 定义了文本的字符串是如何分割为一组*词法元素* 的。
+这些词法元素可以分类为*空格*，_注释_，以及*符号*。
+只有符号对于文本记号到抽象语法的映射是有意义的。
+KerML 文本记号的*语法结构*定义了文法符号是如何分组，以及如何映射成抽象语法表示的。
+
+词法和句法结构都指定为由词法元素或非终结语法元素产生式组成的*文法*。
+产生式的内容使用扩展 Backus-Naur 范式（EBNF）记号指定。
+句法文法包括更多的记号，来描述具象语法如何映射到要合成的抽象语法元素。
+
+句法文法的起始生成式是`RootNamespace`。
+
+**文法生成式定义**
+
+<table>
+  <tr>
+    <td>LEXICAL_ELEMENT = ...</td>
+    <td>
+      定义<code>LEXICAL_ELEMENT</code>的生成式.
+    </td>
+  </tr>
+  <tr>
+    <td>NonterminalElement : AbstractSyntaxElement = ...</td>
+    <td>
+      定义<code>NonterminalElement</code>的生成式，该元素用于合成
+      <code>AbstractSyntaxElement</code>。 <br />
+      如果 <code>NonterminalElement</code> 和<code>AbstractSyntaxElement</code>
+      名称相同， 那么
+      <code>:AbstractSyntaxElement</code>可以省略。
+    </td>
+  </tr>
+</table>
