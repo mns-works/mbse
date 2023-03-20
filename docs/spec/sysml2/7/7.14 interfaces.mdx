@@ -1,0 +1,47 @@
+---
+title: 7.14 接口 
+slug: 7.12_interfaces
+---
+
+### 7.14.1 接口概述
+
+*接口定义（interface definition）*是一种连接定义，其端点被限制为只能是端口定义。
+相应地，接口使用的端点限制为只能是接口使用。
+
+接口只是所有端点都是端口的连接。
+因此，接口体现了规范重用的概念，对部件之间的兼容的连接实现了复用。
+例如，考虑一个在*`Appliance`*和*`Wall Power`*之间的接口定义*`Power`*。
+接口的一端*`power`*端口表示*`Appliance`*连接点，
+而在另一端的*`outlet`*端口表示*`Wall Power`*连接点。 
+该接口之后可以用来连接不同的appliance和wall power。
+
+当对物理接口建模时，接口定义或使用可以包含约束，
+用来对两端的端口的特征值进行约束。
+例如，这些特征可能是*跨越（across）*或者*穿过（through）*变量，
+这些变量受接口上的守恒定律约束（例如，基尔霍夫定律）。
+当在电气组件之间指定接口的时候，跨越和穿过变量分别是定义为*`Voltage`*和*`Current`*的端口特征。
+每个端口上的特征值受到约束，以使电压必须相等，而电流之和必须等于0。
+
+### 7.14.2 接口定义和使用
+接口定义或使用和连接定义或使用的声明类似，
+只是使用关键字`interface`。
+接口使用必须被接口定义所定义。
+接口定义或使用的所有端点特征必须是端口使用，因此在这些端点特征上`port`关键字的使用是可选的。
+
+对于连接使用的简写形式同样适用于接口使用。
+但是，如果接口使用的声明部分是空的，那么`interface`关键字仍然保留，但是`connect`关键字可以省略。
+
+```sysml
+    port def FuelingPort {
+        out fuel : Fuel;
+    }
+    interface def FuelingInterface {
+        end fuelOutPort : FuelingPort;
+        end fuelInPort : ~FuelingPort;
+    }
+    interface fuelLine : FuelingInterface 
+        connect fuelTank.fuelingPort to engine.fuelingPort;
+    // 下述语句和上述作用相同，除了没有使用特定的接口定义
+    interface fuelTank.fuelingPort to engine.fuelingPort;
+
+```
