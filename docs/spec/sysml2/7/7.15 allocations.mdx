@@ -1,9 +1,50 @@
 ---
 title: 7.15 分配
-slug: 7.15_interfaces
+slug: 7.15_allocations
 ---
 
 ### 7.15.1 分配概述
 
 *分配定义（allocation definition）*是一种*连接定义（connection definition）*，
-其指定鱼鳔
+其指定目标元素负责实现源元素的部分或全部意图。
+*分配使用（allocation usage）*是一个或多个分配定义的使用。
+分配定义或使用可以进一步使用内嵌的分配使用来精化，从而实现更细粒度的分配分解。
+
+如系统工程师使用的那样，分配表示横跨系统模型中不同的结构和层级的“映射”。
+“分配”这一概念需要适合抽象系统规范的灵活性，而不是系统或软件设计的特定受限方法。
+系统建模者通常以抽象、初步或有时是试探性的方式将用户模型中的各种元素相关联。
+分配可以在设计早期用作更详细的严格规范和实现的前导。
+
+分配通过建立横跨关系和确保模型中不同的部件被正确集成，为在模型中导航提供了一种有效的方式。
+由于这些关系是可实例化的连接，因此也可以和其他这样的关系建立语义关联，
+例如满足需求、执行动作以及展示状态。
+建模人员还可以创建特化的分配定义，以反映在特定项目上或某个系统模型内部对分配的约定。
+
+### 7.15.2  分配定义和使用
+
+分配定义或使用的声明和连接定义或使用类似，只是使用关键字`allocation`。 
+分配使用只能被分配定义所定义。
+分配定义和使用总是二元的，具有两个端点特征，即使是抽象的也是如此。
+
+简写记号和连接使用类似。
+
+```sysml 
+    part def LogicalSystem {
+        part component : LogicalComponent;
+    }
+    part def PhysicalDevice {
+        part assembly : PhysicalAssembly;
+    }
+    allocation def LogicalToPhysicalAllocation {
+        end part logical : LogicalSystem;
+        end part physical : PhysicalDevice;
+
+        // 内嵌的子分配
+        allocate logical.component to  physical.assembly;
+    }
+    part system : LogicalSystem;
+    part device : PhysicalDevice;
+    allocation systemToDevice : LogicalToPhysicalAllocation 
+        allocate logical :> system to physical :> device;
+```
+
