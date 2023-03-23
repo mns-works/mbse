@@ -34,4 +34,42 @@ TODO:
 ### 7.8.2 枚举定义和使用
 
 枚举定义使用关键字`enum`来声明，其限制见下所述。
-TODO:
+作为一种属性定义，枚举定义一般用来对其他的属性定义或者KerML中的数据类型进行子分类。
+然而，枚举定义不能对另一个枚举定义进行子分类。
+枚举使用通过关键字`enum`来声明。
+
+在枚举定义的内容体中声明的任一拥有的成员必须是枚举使用，
+这些枚举使用是该定义的*枚举值*。 
+枚举定义总是可以认为是一个可变体，而其枚举值就是它的其中一个变体。
+关键字`abstract`和`variation`不能用在枚举定义上。
+如果一个枚举使用用作枚举定义中的枚举值，那么其声明中不能包括关键字`variant`， 
+也不能包括其他的属性关键字（例如，任意的方向关键字、`abstract`、`derived`等）。 
+
+由于内容体中只能声明枚举使用，枚举值的声明可以省略`enum`关键字。 
+作为枚举值的枚举使用可以认为隐式地被拥有它的枚举定义所定义，
+因此，不能有任何其他显式声明的定义。
+
+```sysml 
+    enum def ConditionColor { red; green; yellow; }
+    attribute def ConditionLevel {
+        attribute color : ConditionColor;
+    }
+    enum def RiskLevel :> ConditionLevel {
+        enum low { color = ConditionColor::green; }
+        enum medium { color = ConditionColor::yellow; }
+        enum high { color = ConditionColor::red; }
+    }
+```
+
+和一般的属性使用相比，在枚举定义的内容体之外定义的枚举使用没有特别的限制，
+除了枚举使用必须显式地指定为有单个枚举定义所定义。
+作为一种属性使用，枚举使用也总是引用的，而不论其声明中是否有关键字`ref`，
+其所有的内嵌使用也必须是引用的。
+
+```sysml
+enum assessedRisk : RiskLevel {
+    // 添加了额外的属性。所有的attribute都是引用的，
+    // 因此这是合法的。
+    attribute assessment : String;
+}
+```
