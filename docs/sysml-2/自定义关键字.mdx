@@ -1,0 +1,98 @@
+---
+title: 自定义关键字
+slug: custom-keyword
+draft: true
+---
+
+## 元数据
+
+元数据对模型元素添加额外的信息。
+
+元数据实际上是作为一个特征来定义，这个特征的类型是一个`元类`。
+
+元类的定义示例如下：
+
+```sysml
+    metaclass SecurityRelated;
+
+    metaclass ApprovalAnnotation {
+        feature approved[1] : Boolean;
+        feature approver[1] : String;
+    }
+```
+
+而元数据的定义则是只需定义一个类型为元类的特征即可，使用关键字`metadata`或者符号`@`：
+
+```sysml
+    metadata securityDesignAnnotation : SecurityRelated about SecurityDesign;
+    metadata ApprovalAnnotation about Design {
+        approved = true;
+        approver = "John Smith";
+    }
+```
+
+或者：
+
+```sysml
+// 元数据声明如果忽略about，则其默认标记的就是它的owner
+    class SecurityDesign {
+        @SecurityRelated;
+    }
+    class Design {
+        @ApprovalAnnotation {
+            approved = true;
+            approver = "John Smith";
+        }
+    }
+```
+
+默认一个元数据是可以标记任意类型的元素的，如果要对一个元类可以标记的类型做限制，
+则可以定义`annotatedElement`的子集：
+
+```sysml
+    // 类型为Command的元数据只能标记Behavior或Step
+    metaclass Command {
+        subsets annotatedElement: KerML::Behavior;
+        subsets annotatedElement: KerML::Step;
+    }
+
+    // 使用
+    behavior Save {
+        @Command;
+    }
+```
+
+:::info
+因为所有的metaclass都是`Metaobject`这个元类的子类，所以都继承了`annotatedElement`这个特征。
+:::
+
+## 语义元数据 SemanticMetadata
+
+一般的元数据只是对于目标元素添加了额外的数据，而且其标记的类型可以是任意元素类型。
+而语义元数据则可以建立目标元素和指定元素的隐式继承关系，从而赋予目标元素一定的语义，
+该语义即由指定元素继承而来。
+
+
+
+
+语义元数据相对于一般的元数据，添加了对于baseType标记的元素，其会隐式地
+
+## 自定义关键字
+
+如果一个元数据没有嵌套的其他特征，那么就可以使用
+
+例如，
+```sysml
+    // 一般的元类
+    metaclass SecurityRelated;
+    // 语义元数据
+    metaclass <command> CommandMetadata :> SemanticMetadata {
+        baseType = userActions meta KerML::Feature;
+    }
+
+    // 使用
+    #SecurityRelated #command behavior Save;
+```
+
+由于关键字形式的书写方式不支持嵌套特征，因此我们一般使用语义元数据作为自定义的关键字。
+这样由于默认的隐式继承，就可以通过重定义隐式父类中的特征来添加的特征。

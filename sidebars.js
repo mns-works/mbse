@@ -23,6 +23,7 @@ const sidebars = {
       items: [
         'sysml-2/语言简介',
         'sysml-2/工具',
+        'sysml-2/自定义关键字',
         {
           type: 'category',
           label: '规范',
